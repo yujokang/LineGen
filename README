@@ -1,0 +1,44 @@
+Line Generator
+
+This project includes two header files, line_gen.h and c_gen.h,
+and will build an archive, line_gen.a, to help format lines written to a file.
+It keeps track of the indentation depth, up to a desired limit,
+and automatically applies the indentation when writing on a new line.
+
+Building and Installing:
+You need the contents of the "include" folder
+in your project's include directory, and link to the "line_gen.a" archive.
+The former comes with the source code,
+and the latter will appear in the root of the source directory
+after you run "make".
+
+When compiled out of the box, the library code is not optimized,
+and includes debug information and output.
+To remove debug output, remove "#define DEBUG" from the top of "src/c_gen.c".
+To remove debug information from the binary, remove "-g" from "_CPPFLAGS"
+in "common.mk".
+In "common.mk", you can also modify "_CPPFLAGS" to add optimization,
+and change "CC" to any GCC-compatible compiler.
+
+Creating and using "struct line_gen":
+line_gen.h defines "struct line_gen" and short helper functions for using it.
+If you already have a file output stream (of type "FILE *"),
+you can initialize the struct using "init_line_gen".
+If you only know the path to the file, you can use "open_line_gen",
+and when you no longer need the struct, you can close it,
+including the stream, using "close_line_gen".
+The file contains functions for indenting and unindenting,
+and writing raw text, similar to fwrite, and writing formatted text,
+similar to fprintf, albeit with indentation at the beginning of each line.
+
+Creating and using "struct c_gen":
+c_gen.h defines "struct c_gen",
+which has a field, "base_gen", of type "struct line_gen",
+for which the functions in line_gen.h can be used.
+"init_c_gen" is thus a wrapper around "init_line_gen",
+with a maximum indentation depth of 10,
+and likewise, "open_c_gen" and "close_c_gen" are analogues to
+"open_line_gen" and "close_line_gen", respectively.
+This header file defines a number of helper functions for
+generating C-style statements and blocks, and declares "declare_function",
+which is defined in src/c_gen.c, and thus requires linking to line_gen.a.
