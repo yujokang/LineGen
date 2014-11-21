@@ -155,11 +155,11 @@ static inline int open_block(struct c_gen *to_start)
 {
 	int ret;
 	if ((ret = line_gen_write(BLOCK_OPEN, &to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not write open brace.\n");
+		printlg(ERROR_LEVEL, "Could not write open brace.\n");
 		return ret;
 	}
 	if ((ret = indent(&to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not indent for new block.\n");
+		printlg(ERROR_LEVEL, "Could not indent for new block.\n");
 		return ret;
 	}
 
@@ -180,12 +180,12 @@ static inline int _close_block(struct c_gen *to_close)
 {
 	int ret;
 	if ((ret = unindent(&to_close->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not unindent before closing block.\n");
 		return ret;
 	}
 	if ((ret = line_gen_write(BLOCK_CLOSE, &to_close->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not write close brace.\n");
 		return ret;
 	}
@@ -206,12 +206,12 @@ static inline int close_block(struct c_gen *to_close)
 {
 	int ret;
 	if ((ret = _close_block(to_close))) {
-		printlg(WARNING_LEVEL, "Could not close block.\n");
+		printlg(ERROR_LEVEL, "Could not close block.\n");
 		return ret;
 	}
 
 	if ((ret = finish_line(&to_close->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not start new line after block.\n");
 		return ret;
 	}
@@ -229,11 +229,11 @@ static inline int end_statement(struct c_gen *to_end)
 {
 	int ret;
 	if ((ret = line_gen_write(END_STATEMENT, &to_end->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not end statement.\n");
+		printlg(ERROR_LEVEL, "Could not end statement.\n");
 		return ret;
 	}
 	if ((ret = finish_line(&to_end->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not start line after the statement.\n");
 		return ret;
 	}
@@ -255,11 +255,11 @@ static inline int start_if(struct c_gen *to_start, char *condition)
 {
 	int ret;
 	if (line_gen_printf(&to_start->base_gen, IF_FMT, condition) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write \"if\" line.\n");
+		printlg(ERROR_LEVEL, "Could not write \"if\" line.\n");
 		return -1;
 	}
 	if ((ret = open_block(to_start))) {
-		printlg(WARNING_LEVEL, "Could not open \"if\" block.\n");
+		printlg(ERROR_LEVEL, "Could not open \"if\" block.\n");
 		return ret;
 	}
 
@@ -280,11 +280,11 @@ static inline int start_while(struct c_gen *to_start, char *condition)
 {
 	int ret;
 	if (line_gen_printf(&to_start->base_gen, WHILE_FMT, condition) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write \"while\" line.\n");
+		printlg(ERROR_LEVEL, "Could not write \"while\" line.\n");
 		return -1;
 	}
 	if ((ret = open_block(to_start))) {
-		printlg(WARNING_LEVEL, "Could not open \"while\" block.\n");
+		printlg(ERROR_LEVEL, "Could not open \"while\" block.\n");
 		return ret;
 	}
 
@@ -305,11 +305,11 @@ static inline int start_switch(struct c_gen *to_start, char *expr)
 {
 	int ret;
 	if (line_gen_printf(&to_start->base_gen, SWITCH_FMT, expr) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write \"switch\" line.\n");
+		printlg(ERROR_LEVEL, "Could not write \"switch\" line.\n");
 		return -1;
 	}
 	if ((ret = open_block(to_start))) {
-		printlg(WARNING_LEVEL, "Could not open \"switch\" block.\n");
+		printlg(ERROR_LEVEL, "Could not open \"switch\" block.\n");
 		return ret;
 	}
 
@@ -329,16 +329,16 @@ static inline int add_case(struct c_gen *to_start, char *value)
 {
 	int ret;
 	if ((ret = unindent(&to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not unindent to add case.\n");
+		printlg(ERROR_LEVEL, "Could not unindent to add case.\n");
 		return ret;
 	}
 	if (line_gen_printf(&to_start->base_gen, CASE_FMT, value) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write value for \"case\"\n");
+		printlg(ERROR_LEVEL, "Could not write value for \"case\"\n");
 		return -1;
 	}
 
 	if ((ret = indent(&to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not indent after \"case\"\n");
+		printlg(ERROR_LEVEL, "Could not indent after \"case\"\n");
 		return -1;
 	}
 
@@ -358,17 +358,17 @@ static inline int add_default(struct c_gen *to_start)
 {
 	int ret;
 	if ((ret = unindent(&to_start->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not unindent to add default case.\n");
 		return ret;
 	}
 	if ((ret = line_gen_write(DEFAULT_KW, &to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not start default case\n");
+		printlg(ERROR_LEVEL, "Could not start default case\n");
 		return ret;
 	}
 
 	if ((ret = indent(&to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not indent after default case\n");
+		printlg(ERROR_LEVEL, "Could not indent after default case\n");
 		return -1;
 	}
 
@@ -393,11 +393,11 @@ static inline int start_for(struct c_gen *to_start,
 	int ret;
 	if (line_gen_printf(&to_start->base_gen, FOR_FMT,
 			    init, condition, progress) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write \"for\" line.\n");
+		printlg(ERROR_LEVEL, "Could not write \"for\" line.\n");
 		return -1;
 	}
 	if ((ret = open_block(to_start))) {
-		printlg(WARNING_LEVEL, "Could not open \"for\" block.\n");
+		printlg(ERROR_LEVEL, "Could not open \"for\" block.\n");
 		return ret;
 	}
 
@@ -416,17 +416,17 @@ static inline int start_else(struct c_gen *to_start)
 {
 	int ret;
 	if ((ret = _close_block(to_start))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not end block before \"else\".\n");
 		return ret;
 	}
 	if ((ret = line_gen_write(ELSE_KW, &to_start->base_gen))) {
-		printlg(WARNING_LEVEL, "Could not write \"else\" statement\n");
+		printlg(ERROR_LEVEL, "Could not write \"else\" statement\n");
 		return ret;
 	}
 
 	if ((ret = open_block(to_start))) {
-		printlg(WARNING_LEVEL, "Could not open \"else\" block.\n");
+		printlg(ERROR_LEVEL, "Could not open \"else\" block.\n");
 		return ret;
 	}
 
@@ -446,17 +446,17 @@ static inline int start_else_if(struct c_gen *to_start, char *condition)
 {
 	int ret;
 	if ((ret = _close_block(to_start))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not end block before else-if.\n");
 		return ret;
 	}
 	if (line_gen_printf(&to_start->base_gen, ELSE_IF_FMT, condition) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write else-if statement\n");
+		printlg(ERROR_LEVEL, "Could not write else-if statement\n");
 		return -1;
 	}
 
 	if ((ret = open_block(to_start))) {
-		printlg(WARNING_LEVEL, "Could not open else-if block.\n");
+		printlg(ERROR_LEVEL, "Could not open else-if block.\n");
 		return ret;
 	}
 
@@ -477,11 +477,11 @@ inline static int include_local(struct c_gen *to_include_in,
 
 	if (line_gen_printf(&to_include_in->base_gen, INCLUDE_LOCAL_FMT,
 			    local_header) <= 0) {
-		printlg(WARNING_LEVEL, "Could not write local include line.\n");
+		printlg(ERROR_LEVEL, "Could not write local include line.\n");
 		return -1;
 	}
 	if ((ret = finish_line(&to_include_in->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not finish local include line.\n");
 		return ret;
 	}
@@ -503,11 +503,11 @@ inline static int include(struct c_gen *to_include_in, const char *header)
 
 	if (line_gen_printf(&to_include_in->base_gen, INCLUDE_FMT, header)
 	    <= 0) {
-		printlg(WARNING_LEVEL, "Could not write include line.\n");
+		printlg(ERROR_LEVEL, "Could not write include line.\n");
 		return -1;
 	}
 	if ((ret = finish_line(&to_include_in->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not finish include line.\n");
 		return ret;
 	}

@@ -10,22 +10,22 @@ int declare_function(struct c_gen *to_declare, const char *type,
 	int ret;
 
 	if ((ret = line_gen_write(type, &to_declare->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not write function return type.\n");
 		return ret;
 	}
 	if ((ret = line_gen_write(" ", &to_declare->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not write space after function return type.\n");
 		return ret;
 	}
 	if ((ret = line_gen_write(name, &to_declare->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not write function name.\n");
 		return ret;
 	}
 	if ((ret = line_gen_write(PAREN_OPEN, &to_declare->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not start arguments.\n");
 		return ret;
 	}
@@ -36,25 +36,26 @@ int declare_function(struct c_gen *to_declare, const char *type,
 		if (arg_i > 0) {
 			if ((ret = line_gen_write(NEW_ARG,
 						  &to_declare->base_gen))) {
-				printlg(WARNING_LEVEL,
+				printlg(ERROR_LEVEL,
 					"Could not write delimiter before "
 					"%u.\n",
 					(unsigned) arg_i);
 				return ret;
 			}
 		}
-		if ((ret = line_gen_printf(&to_declare->base_gen, VAR_DEC_FMT,
-					   arg->type, arg->name))) {
-			printlg(WARNING_LEVEL,
-				"Could not write argument %u.\n",
-				(unsigned) arg_i);
+		if (line_gen_printf(&to_declare->base_gen, VAR_DEC_FMT,
+					   arg->type, arg->name) <= 0) {
+			printlg(ERROR_LEVEL,
+				"Could not write argument %u, (" VAR_DEC_FMT
+				").\n",
+				(unsigned) arg_i, arg->type, arg->name);
 			return ret;
 		}
 	}
 	va_end(args);
 
 	if ((ret = line_gen_write(PAREN_CLOSE, &to_declare->base_gen))) {
-		printlg(WARNING_LEVEL,
+		printlg(ERROR_LEVEL,
 			"Could not close arguments.\n");
 		return ret;
 	}

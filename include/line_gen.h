@@ -71,7 +71,7 @@ static inline int open_line_gen(struct line_gen *to_open,
 {
 	FILE *out_stream = fopen(path, "w");
 	if (out_stream == NULL) {
-		printlg(WARNING_LEVEL, "Could not open stream.\n");
+		printlg(DEBUG_LEVEL, "Could not open stream.\n");
 		return -1;
 	}
 
@@ -115,7 +115,7 @@ static inline int try_start_line(struct line_gen *to_write)
 			written = fwrite(tab_buf, to_write->indent, 1,
 					 to_write->out_stream);
 			if (written == 0) {
-				printlg(WARNING_LEVEL,
+				printlg(DEBUG_LEVEL,
 					"Could not indent: %d.\n", errno);
 				return -1;
 			}
@@ -140,7 +140,7 @@ static inline int finish_line(struct line_gen *to_write)
 	size_t written = fwrite(LINE_BREAK_STR, LINE_BREAK_LEN, 1,
 				to_write->out_stream);
 	if (written == 0) {
-		printlg(WARNING_LEVEL, "Could break line.\n");
+		printlg(DEBUG_LEVEL, "Could break line.\n");
 		return -1;
 	}
 	to_write->on_new_line = 1;
@@ -167,14 +167,14 @@ static inline int indent(struct line_gen *to_indent)
 {
 	int finish_line_ret;
 	if (to_indent->indent >= to_indent->max_indent) {
-		printlg(WARNING_LEVEL, "Indentation would exceed maximum of "
+		printlg(DEBUG_LEVEL, "Indentation would exceed maximum of "
 				       "%u.\n",
 			(unsigned) to_indent->max_indent);
 		return -2;
 	}
 	if (!to_indent->on_new_line &&
 	    (finish_line_ret = finish_line(to_indent))) {
-		printlg(WARNING_LEVEL,
+		printlg(DEBUG_LEVEL,
 			"Failed to start line before indentation.\n");
 		return finish_line_ret;
 	}
@@ -206,7 +206,7 @@ static inline int less_indent(struct line_gen *to_unindent, size_t less)
 {
 	int finish_line_ret;
 	if (to_unindent->indent < less) {
-		printlg(WARNING_LEVEL, "Current indentation of %u "
+		printlg(DEBUG_LEVEL, "Current indentation of %u "
 				       "is less than %u, "
 				       "by which we want to decrease it.\n",
 			(unsigned) to_unindent->indent, (unsigned) less);
@@ -214,7 +214,7 @@ static inline int less_indent(struct line_gen *to_unindent, size_t less)
 	}
 	if (!to_unindent->on_new_line &&
 	    (finish_line_ret = finish_line(to_unindent))) {
-		printlg(WARNING_LEVEL,
+		printlg(DEBUG_LEVEL,
 			"Failed to start line before unindentation.\n");
 		return finish_line_ret;
 	}
@@ -249,12 +249,12 @@ static inline int unindent(struct line_gen *to_unindent)
 static inline int line_gen_write(const char *text, struct line_gen *to_write)
 {
 	if (try_start_line(to_write)) {
-		printlg(WARNING_LEVEL,
+		printlg(DEBUG_LEVEL,
 			"Failed to indent before writing raw text.\n");
 		return -1;
 	}
 	if (fwrite(text, strlen(text), 1, to_write->out_stream) == 0) {
-		printlg(WARNING_LEVEL, "Failed to write raw text.\n");
+		printlg(DEBUG_LEVEL, "Failed to write raw text.\n");
 		return -1;
 	}
 	return 0;
@@ -276,7 +276,7 @@ static inline int line_gen_printf(struct line_gen *to_write,
 	int ret;
 
 	if (try_start_line(to_write)) {
-		printlg(WARNING_LEVEL,
+		printlg(DEBUG_LEVEL,
 			"Failed to indent before writing formatted text.\n");
 		return -1;
 	}
