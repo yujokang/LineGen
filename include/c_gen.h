@@ -516,6 +516,58 @@ inline static int include(struct c_gen *to_include_in, const char *header)
 }
 
 /*
+ * Generate single statement to declare a variable, without defining it.
+ * to_declare:	the stream in which to declare the variable
+ * new_var	the variable to declare
+ * returns	0 on success;
+ *		-1 if writing or ending the line failed, with errno set
+ */
+inline static int
+declare_variable(struct c_gen *to_declare, struct typed_var *new_var)
+{
+	int ret;
+
+	if (line_gen_printf(&(to_declare->base_gen), VAR_DEC_FMT,
+			    new_var->type, new_var->name) <= 0) {
+		printlg(ERROR_LEVEL, "Could not declare %s %s.\n",
+			new_var->type, new_var->name);
+		return -1;
+	}
+	if ((ret = end_statement(to_declare))) {
+		printlg(ERROR_LEVEL,
+			"Could not finish declaration statement.\n");
+		return ret;
+	}
+
+	return 0;
+}
+
+/*
+ * Write a single line to return a non-void value.
+ * to_return:	the stream in which to write the return line
+ * ret_value:	the expression whose value to return
+ * returns	0 on success;
+ *		-1 if writing or ending the line failed, with errno set
+ */
+inline static int return_value(struct c_gen *to_return, char *ret_value)
+{
+	int ret;
+
+	if (line_gen_printf(&(to_return->base_gen), RETURN_VAL_FMT,
+			    ret_value) <= 0) {
+		printlg(ERROR_LEVEL, "Could not return %s.\n", ret_value);
+		return -1;
+	}
+	if ((ret = end_statement(to_return))) {
+		printlg(ERROR_LEVEL,
+			"Could not finish return statement.\n");
+		return ret;
+	}
+
+	return 0;
+}
+
+/*
  * Begin a function declaration.
  * Can be used to start a definition, with a new block,
  * or just a declaration, by ending the line as a statement.
