@@ -25,7 +25,9 @@ int files_equal(FILE *in_0, FILE *in_1)
 					(unsigned) (total_read + read_1));
 				ret = 0;
 			}
-			have_bytes = 0;
+			if (read_0 == 0) {
+				have_bytes = 0;
+			}
 		}
 		if (have_bytes) {
 			size_t byte_i;
